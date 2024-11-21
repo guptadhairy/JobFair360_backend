@@ -30,10 +30,23 @@ app.use('/api/applications', applicationRoutes);
 app.use(errorHandler);
 
 // Database connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 15000, // Increase timeout to 15 seconds
+            socketTimeoutMS: 45000, // Increase socket timeout to 45 seconds
+        });
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+        process.exit(1); // Exit the process if the connection fails
+    }
+};
+
+// Call the connectDB function to establish the connection
+connectDB();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
